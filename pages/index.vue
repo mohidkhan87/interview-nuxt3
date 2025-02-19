@@ -6,13 +6,13 @@
                     <ul class="py-5">
                         <li v-for="(item, index) in menuItems" :key="index" class="px-2 cursor-pointer"
                             @click="handleMenuClick(item)">
-                            {{ item.label }}
+                            {{ item.name }}
                         </li>
                     </ul>
                 </div>
             </div>
             <div class="flex-1 flex items-center justify-center bg-green-300">
-                <ScreenOne v-if="currentScreen === 'screen_1'" />
+                <ScreenOne v-if="currentScreen === 'screen_1'" :menuItems="menuItems" />
                 <ScreenTwo v-else-if="currentScreen === 'screen_2'" />
                 <ScreenThree v-else-if="currentScreen === 'screen_3'" />
             </div>
@@ -29,18 +29,13 @@ const menuItems = ref<ScreenItem[]>();
 const currentScreen = ref<ScreenType>("screen_1");
 
 const handleMenuClick = (screenItem: ScreenItem) => {
-    currentScreen.value = screenItem.value as ScreenType;
+    currentScreen.value = screenItem.key as ScreenType;
 };
 
 const getScreens = async () => {
     try {
         const response = await api.get("/api/screens");
-        menuItems.value = response.data.map((item: any) => {
-            return {
-                label: item.name,
-                value: item.key
-            }
-        })
+        menuItems.value = response.data;
     } catch (error) {
         console.error(error);
     }

@@ -4,8 +4,9 @@
             <div class="min-w-80 bg-blue-300">
                 <div>
                     <ul class="py-5">
-                        <li v-for="(item, index) in menuItems" :key="index" class="px-2 cursor-pointer" @click="handleMenuClick(item)">
-                            {{item.label}}
+                        <li v-for="(item, index) in menuItems" :key="index" class="px-2 cursor-pointer"
+                            @click="handleMenuClick(item)">
+                            {{ item.label }}
                         </li>
                     </ul>
                 </div>
@@ -19,26 +20,33 @@
     </main>
 </template>
 <script setup lang="ts">
-import type { ScreenItem, ScreenType } from '~/types/dashboard';
+import { useApi } from "~/composables/useAPI";
+import type { ScreenItem, ScreenType } from "~/types/dashboard";
 
+const { api } = useApi();
 
-const menuItems = ref<ScreenItem[]>([
-    {
-        label: "Screen 1",
-        value: "screen_1"
-    },
-    {
-        label: "Screen 2",
-        value: "screen_2"
-    },
-    {
-        label: "Screen 3",
-        value: "screen_3"
-    }
-]);
+const menuItems = ref<ScreenItem[]>();
 const currentScreen = ref<ScreenType>("screen_1");
 
 const handleMenuClick = (screenItem: ScreenItem) => {
     currentScreen.value = screenItem.value as ScreenType;
-}
+};
+
+const getScreens = async () => {
+    try {
+        const response = await api.get("/api/screens");
+        menuItems.value = response.data.map((item: any) => {
+            return {
+                label: item.name,
+                value: item.key
+            }
+        })
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+onMounted(() => {
+    getScreens();
+})
 </script>
